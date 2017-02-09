@@ -1,10 +1,11 @@
 ;;; qrencode.el --- emacs interface to `qrencode'    -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2011-2013  Leo Liu
+;; Copyright (C) 2011-2017  Leo Liu
 
 ;; Author: Leo Liu <sdl.web@gmail.com>
-;; Version: 1.0
+;; Version: 1.1
 ;; Keywords: tools, convenience
+;; Package-Requires: ((cl-lib "0.5.0"))
 ;; Created: 2011-05-05
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -31,7 +32,7 @@
 
 ;;; Code:
 
-(eval-when-compile (require 'cl))
+(eval-when-compile (require 'cl-lib))
 
 (defcustom qrencode-program "qrencode"
   "Name of the program `qrencode'."
@@ -39,7 +40,7 @@
   :group 'image)
 
 ;;;###autoload
-(defun* qrencode-string (string &key (type "png") (size 3) (level "L") (margin 4))
+(cl-defun qrencode-string (string &key (type "png") (size 3) (level "L") (margin 4))
   "QRencode STRING and return a binary string of image data.
 TYPE specifies the generated image format (default png): png,
 eps, ansi, ansi256, ascii. SIZE (default 3) is a number
@@ -57,18 +58,18 @@ margin in the resulting image."
   (with-temp-buffer
     (set-buffer-multibyte nil)
     (or (zerop (call-process qrencode-program
-                      nil t nil
-                      "-o" "-"
-                      "-t" type
-                      "-l" level
-                      "-s" (number-to-string size)
-                      "-m" (number-to-string margin)
-                      string))
+                             nil t nil
+                             "-o" "-"
+                             "-t" type
+                             "-l" level
+                             "-s" (number-to-string size)
+                             "-m" (number-to-string margin)
+                             string))
         (error "Process `qrencode' returns non zero:\n%s" (buffer-string)))
     (buffer-string)))
 
 ;;;###autoload
-(defun* qrencode-region (beg end &key (size 3) (level "L") (margin 4))
+(cl-defun qrencode-region (beg end &key (size 3) (level "L") (margin 4))
   "QRencode the region between BEG and END and return image data.
 See `qrencode-string' for the meaning of argument SIZE, LEVEL and
 MARGIN."
